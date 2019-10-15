@@ -6,7 +6,7 @@ import { NoteState, Note, Folders, FolderKeys } from '../types'
 const DefaultNoteState: NoteState = {
   notes: [],
   activeFolder: Folders.ALL,
-  activeCategoryId: '',
+  activeTag: '',
   activeNoteId: '',
   error: '',
   loading: false,
