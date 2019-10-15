@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createContainer } from 'unstated-next'
 import uuid from 'uuid'
-import { NoteState, Note, Folders, FolderKeys } from '../types'
+import { NoteState, Note, Folders, FolderKeys, Tag } from '../types'
 
 const DefaultNoteState: NoteState = {
   notes: [],
@@ -31,9 +31,13 @@ function useNotes(initial: NoteState = DefaultNoteState) {
     syncStore({ activeFolder: folder })
   }
 
+  const changeActiveTag = (tag: Tag) => {
+    syncStore({ activeTag: tag })
+  }
+
   const { notes, activeFolder, loading } = store
 
-  return { notes, activeFolder, loading, addNote, changeActiveFolder }
+  return { notes, activeFolder, loading, addNote, changeActiveFolder, changeActiveTag }
 }
 
 export const NoteContainer = createContainer(useNotes)

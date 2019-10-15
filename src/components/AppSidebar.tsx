@@ -44,12 +44,11 @@ const useStyles = makeStyles({
     '& h3': {
       margin: 0,
       color: '#888',
-      textTransform: 'uppercase',
       fontSize: '0.9rem',
     },
   },
   addTagIcon: {
-    fontSize: '1rem',
+    fontSize: '1.2rem',
     cursor: 'pointer',
   },
   tags: {},
@@ -77,7 +76,7 @@ interface AppSidebarProps {}
 
 const AppSidebar: React.FC<AppSidebarProps> = () => {
   const classes = useStyles()
-  const { activeFolder, changeActiveFolder } = NoteContainer.useContainer()
+  const { activeFolder, changeActiveFolder, changeActiveTag } = NoteContainer.useContainer()
   const { tags } = TagContainer.useContainer()
 
   return (
@@ -101,6 +100,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
             <div
               key={item}
               className={`${classes.folderItem} ${activeFolder === item ? 'active' : ''}`}
+              onClick={() => changeActiveTag(item)}
             >
               <FolderOpen className={classes.folderIcon} />
               {item}
