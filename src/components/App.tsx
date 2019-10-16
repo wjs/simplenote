@@ -1,9 +1,9 @@
-import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import AppSidebar from './AppSidebar'
-import NoteList from './NoteList'
-import NoteEditor from './NoteEditor'
+import React from 'react'
 import { NoteContainer, TagContainer } from '../stores'
+import AppSidebar from './AppSidebar'
+import NoteEditor from './NoteEditor'
+import NoteList from './NoteList'
 
 const useStyles = makeStyles({
   root: {

@@ -1,6 +1,6 @@
 import { useReducer } from 'react'
 import { createContainer } from 'unstated-next'
-import { Tag, Note, FolderKeys, Folders } from '../types'
+import { FolderKeys, Folders, Note, Tag } from '../types'
 
 export enum NoteActionType {
   CHOOSE_FOLDER = 'CHOOSE_FOLDER',
