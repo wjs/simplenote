@@ -1,9 +1,28 @@
-import { useState } from 'react'
+import { useReducer } from 'react'
 import { createContainer } from 'unstated-next'
-import uuid from 'uuid'
-import { NoteState, Note, Folders, FolderKeys, Tag } from '../types'
+import { Tag, Note, FolderKeys, Folders } from '../types'
 
-const DefaultNoteState: NoteState = {
+export enum NoteActionType {
+  CHOOSE_FOLDER = 'CHOOSE_FOLDER',
+  CHOOSE_TAG = 'CHOOSE_TAG',
+  CHOOSE_NOTE = 'CHOOSE_NOTE',
+}
+
+export type NoteAction =
+  | { type: NoteActionType.CHOOSE_FOLDER; payload: FolderKeys }
+  | { type: NoteActionType.CHOOSE_TAG; payload: Tag }
+  | { type: NoteActionType.CHOOSE_NOTE; payload: Tag }
+
+export interface NoteState {
+  notes: Note[]
+  activeFolder: FolderKeys
+  activeTag: Tag
+  activeNoteId: string
+  error: string
+  loading: boolean
+}
+
+export const initialNoteState: NoteState = {
   notes: [],
   activeFolder: Folders.ALL,
   activeTag: '',
@@ -12,32 +31,22 @@ const DefaultNoteState: NoteState = {
   loading: false,
 }
 
-function useNotes(initial: NoteState = DefaultNoteState) {
-  const [store, setStore] = useState<NoteState>(initial)
-
-  const syncStore = (updator: Partial<NoteState>) => {
-    // TODO: save to localstorage
-    setStore({
-      ...store,
-      ...updator,
-    })
+export function notesReducer(state: NoteState, action: NoteAction): NoteState {
+  switch (action.type) {
+    case NoteActionType.CHOOSE_FOLDER:
+      return { ...state, activeFolder: action.payload, activeTag: '' }
+    case NoteActionType.CHOOSE_TAG:
+      return { ...state, activeFolder: Folders.TAG, activeTag: action.payload }
+    case NoteActionType.CHOOSE_NOTE:
+      return { ...state, activeNoteId: action.payload }
+    default:
+      return state
   }
+}
 
-  const addNote = (note: Note) => {
-    syncStore({ notes: [...store.notes, note] })
-  }
-
-  const changeActiveFolder = (folder: FolderKeys) => {
-    syncStore({ activeFolder: folder })
-  }
-
-  const changeActiveTag = (tag: Tag) => {
-    syncStore({ activeTag: tag })
-  }
-
-  const { notes, activeFolder, loading } = store
-
-  return { notes, activeFolder, loading, addNote, changeActiveFolder, changeActiveTag }
+function useNotes(initial: NoteState = initialNoteState) {
+  const [state, dispatch] = useReducer(notesReducer, initial)
+  return { noteState: state, noteDispatch: dispatch }
 }
 
 export const NoteContainer = createContainer(useNotes)

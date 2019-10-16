@@ -1,7 +1,7 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
+import { FolderDict, Folders } from '../types'
 import { NoteContainer } from '../stores'
-import { FolderDict } from '../types'
 
 const useStyles = makeStyles({
   root: {
@@ -22,11 +22,14 @@ interface NoteListProps {}
 
 const NoteList: React.FC<NoteListProps> = () => {
   const classes = useStyles()
-  const { activeFolder, notes } = NoteContainer.useContainer()
+  const { noteState } = NoteContainer.useContainer()
+  const { activeFolder, activeTag, notes } = noteState
 
   return (
     <aside className={classes.root}>
-      <div className={classes.noteListHeader}>{FolderDict[activeFolder]}</div>
+      <div className={classes.noteListHeader}>
+        {activeFolder === Folders.TAG ? activeTag : FolderDict[activeFolder]}
+      </div>
       <div className={classes.noteList}>
         {notes.map(item => (
           <div key={item.id}>{item.content}</div>

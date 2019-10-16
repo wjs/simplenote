@@ -1,35 +1,50 @@
-import { useState } from 'react'
+import { useReducer } from 'react'
 import { createContainer } from 'unstated-next'
-import { TagState, Tag } from '../types'
+import { Tag } from '../types'
 
-const DefaultTagState: TagState = {
-  tags: ['aaa', 'bbb', 'ccc'],
-  error: '',
-  loading: false,
+export enum TagActionType {
+  SHOW_ADD_TAG_INPUT = 'SHOW_ADD_TAG_INPUT',
+  HIDE_ADD_TAG_INPUT = 'HIDE_ADD_TAG_INPUT',
+  ADD_TAG = 'ADD_TAG',
+  DEL_TAG = 'DEL_TAG',
 }
 
-function useTags(initial: TagState = DefaultTagState) {
-  const [store, setStore] = useState<TagState>(initial)
+export type TagAction =
+  | { type: TagActionType.SHOW_ADD_TAG_INPUT }
+  | { type: TagActionType.HIDE_ADD_TAG_INPUT }
+  | { type: TagActionType.ADD_TAG; payload: Tag }
+  | { type: TagActionType.DEL_TAG; payload: Tag }
 
-  const syncStore = (updator: Partial<TagState>) => {
-    // TODO: save to localstorage
-    setStore({
-      ...store,
-      ...updator,
-    })
+export interface TagState {
+  tags: Tag[]
+  showAddTagInput: boolean
+  addTagValue: string
+}
+
+export const initialTagState: TagState = {
+  tags: ['aaa', 'bbb', 'ccc'],
+  showAddTagInput: false,
+  addTagValue: '',
+}
+
+export function tagsReducer(state: TagState, action: TagAction): TagState {
+  switch (action.type) {
+    case TagActionType.SHOW_ADD_TAG_INPUT:
+      return { ...state, showAddTagInput: true }
+    case TagActionType.HIDE_ADD_TAG_INPUT:
+      return { ...state, showAddTagInput: false }
+    case TagActionType.ADD_TAG:
+      return { ...state, tags: [...state.tags, action.payload] }
+    case TagActionType.DEL_TAG:
+      return { ...state, tags: state.tags.filter(x => x !== action.payload) }
+    default:
+      return state
   }
+}
 
-  const addTag = (tag: Tag) => {
-    syncStore({ tags: [...store.tags, tag] })
-  }
-
-  const delTag = (tag: Tag) => {
-    syncStore({ tags: store.tags.filter(x => x !== tag) })
-  }
-
-  const { tags, error, loading } = store
-
-  return { tags, error, loading, addTag, delTag }
+function useTags(initial: TagState = initialTagState) {
+  const [state, dispatch] = useReducer(tagsReducer, initial)
+  return { tagState: state, tagDispatch: dispatch }
 }
 
 export const TagContainer = createContainer(useTags)

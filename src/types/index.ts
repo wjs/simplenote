@@ -2,6 +2,7 @@ export enum Folders {
   ALL = 'ALL',
   FAVORITES = 'FAVORITES',
   TRASH = 'TRASH',
+  TAG = 'TAG',
 }
 
 export type FolderKeys = keyof typeof Folders
@@ -23,18 +24,3 @@ export interface Note {
 }
 
 export type Tag = string
-
-export interface NoteState {
-  notes: Note[]
-  activeFolder: string
-  activeTag: Tag
-  activeNoteId: string
-  error: string
-  loading: boolean
-}
-
-export interface TagState {
-  tags: Tag[]
-  error: string
-  loading: boolean
-}

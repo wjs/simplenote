@@ -3,8 +3,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import AppSidebar from './AppSidebar'
 import NoteList from './NoteList'
 import NoteEditor from './NoteEditor'
-import { NoteContainer } from '../stores'
-import { TagContainer } from '../stores/tags'
+import { NoteContainer, TagContainer } from '../stores'
 
 const useStyles = makeStyles({
   root: {
@@ -23,9 +22,9 @@ const App: React.FC = () => {
       <NoteContainer.Provider>
         <TagContainer.Provider>
           <AppSidebar />
-          <NoteList />
-          <NoteEditor />
         </TagContainer.Provider>
+        <NoteList />
+        <NoteEditor />
       </NoteContainer.Provider>
     </div>
   )
