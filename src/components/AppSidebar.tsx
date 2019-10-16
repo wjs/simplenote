@@ -1,8 +1,9 @@
 import { makeStyles } from '@material-ui/core/styles'
-import { BookmarkBorder, Delete, Description, Add, Settings } from '@material-ui/icons'
+import { Add, BookmarkBorder, Delete, Description, Settings } from '@material-ui/icons'
 import React from 'react'
+import uuid from 'uuid'
 import { NoteActionType, NoteContainer } from '../stores'
-import { FolderDict, Folders } from '../types'
+import { FolderDict, Folders, Note } from '../types'
 import TagList from './TagList'
 
 const useStyles = makeStyles({
@@ -44,11 +45,11 @@ const useStyles = makeStyles({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    margin: '0 0.5rem',
-    padding: '0.7rem',
+    margin: '0 .5rem',
+    padding: '.3rem',
     borderRadius: '50%',
     backgroundColor: '#292929',
-    fontSize: '3rem',
+    fontSize: '2.5rem',
     cursor: 'pointer',
     '&:hover': {
       color: 'green',
@@ -81,6 +82,18 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const { noteState, noteDispatch } = NoteContainer.useContainer()
   const { activeFolder } = noteState
 
+  const handleAddNode = () => {
+    const now = new Date().toISOString()
+    const newNote: Note = {
+      id: uuid.v4(),
+      content: '',
+      createAt: now,
+      updateAt: now,
+      tags: [],
+    }
+    noteDispatch({ type: NoteActionType.ADD_NOTE, payload: newNote })
+  }
+
   return (
     <aside className={classes.appSidebar}>
       <section className={classes.sidebarMain}>
@@ -96,7 +109,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
         <TagList />
       </section>
       <section className={classes.sidebarBottom}>
-        <Add className={classes.bottomIcon} />
+        <Add className={classes.bottomIcon} onClick={handleAddNode} />
         <Settings className={classes.bottomIcon} />
       </section>
     </aside>

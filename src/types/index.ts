@@ -23,4 +23,7 @@ export interface Note {
   trash?: boolean
 }
 
-export type Tag = string
+export interface Tag {
+  id: string
+  name: string
+}

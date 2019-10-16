@@ -16,6 +16,7 @@ const useStyles = makeStyles({
     fontWeight: 700,
   },
   noteList: {},
+  noteItem: {},
 })
 
 interface NoteListProps {}
@@ -32,7 +33,9 @@ const NoteList: React.FC<NoteListProps> = () => {
       </div>
       <div className={classes.noteList}>
         {notes.map(item => (
-          <div key={item.id}>{item.content}</div>
+          <div key={item.id} className={classes.noteItem}>
+            {item.content}
+          </div>
         ))}
       </div>
     </aside>
