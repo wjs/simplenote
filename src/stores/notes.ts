@@ -6,12 +6,14 @@ export enum NoteActionType {
   CHOOSE_FOLDER = 'CHOOSE_FOLDER',
   CHOOSE_TAG = 'CHOOSE_TAG',
   CHOOSE_NOTE = 'CHOOSE_NOTE',
+  ADD_NOTE = 'ADD_NOTE',
 }
 
 export type NoteAction =
   | { type: NoteActionType.CHOOSE_FOLDER; payload: FolderKeys }
   | { type: NoteActionType.CHOOSE_TAG; payload: Tag }
   | { type: NoteActionType.CHOOSE_NOTE; payload: Tag }
+  | { type: NoteActionType.ADD_NOTE; payload: Note }
 
 export interface NoteState {
   notes: Note[]
@@ -39,6 +41,8 @@ export function notesReducer(state: NoteState, action: NoteAction): NoteState {
       return { ...state, activeFolder: Folders.TAG, activeTag: action.payload }
     case NoteActionType.CHOOSE_NOTE:
       return { ...state, activeNoteId: action.payload }
+    case NoteActionType.ADD_NOTE:
+      return { ...state, notes: [...state.notes, action.payload] }
     default:
       return state
   }

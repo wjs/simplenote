@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles'
-import { BookmarkBorder, Delete, Description } from '@material-ui/icons'
+import { BookmarkBorder, Delete, Description, Add, Settings } from '@material-ui/icons'
 import React from 'react'
 import { NoteActionType, NoteContainer } from '../stores'
 import { FolderDict, Folders } from '../types'
@@ -16,7 +16,6 @@ const useStyles = makeStyles({
   sidebarMain: {
     flexGrow: 1,
   },
-  sidebarBottom: {},
   folderItem: {
     display: 'flex',
     alignItems: 'center',
@@ -34,6 +33,26 @@ const useStyles = makeStyles({
   folderIcon: {
     marginRight: '.5rem',
     fontSize: '1.1rem',
+  },
+  sidebarBottom: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: '.5rem 0',
+  },
+  bottomIcon: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: '0 0.5rem',
+    padding: '0.7rem',
+    borderRadius: '50%',
+    backgroundColor: '#292929',
+    fontSize: '3rem',
+    cursor: 'pointer',
+    '&:hover': {
+      color: 'green',
+    },
   },
 })
 
@@ -76,7 +95,10 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
         ))}
         <TagList />
       </section>
-      <section className={classes.sidebarBottom}></section>
+      <section className={classes.sidebarBottom}>
+        <Add className={classes.bottomIcon} />
+        <Settings className={classes.bottomIcon} />
+      </section>
     </aside>
   )
 }
