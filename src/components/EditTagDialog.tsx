@@ -56,7 +56,6 @@ const useStyles = makeStyles({
     fontWeight: 600,
   },
   tagInput: {
-    marginBottom: '.2rem',
     '& .MuiInput-underline:after': {
       borderBottomColor: 'green',
     },
@@ -138,7 +137,7 @@ const EditTagDialog: React.FC<EditTagDialogProps> = ({ open, handleClose }) => {
 
   return (
     <>
-      <Dialog disableBackdropClick={addValue || editValue} onClose={handleClose} open={open}>
+      <Dialog disableBackdropClick onClose={handleClose} open={open}>
         <DialogTitle className={classes.dialogTitle}>
           <div>Edit Tags</div>
           <TextField

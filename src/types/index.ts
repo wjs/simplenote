@@ -19,6 +19,7 @@ export type TagId = string
 
 export interface Note {
   id: NoteId
+  title: string
   content: string
   createAt: string
   updateAt: string

@@ -57,7 +57,7 @@ interface TagListProps {}
 
 const TagList: React.FC<TagListProps> = () => {
   const classes = useStyles()
-  const [openEdit, setOpenEdit] = useState(true)
+  const [openEdit, setOpenEdit] = useState(false)
   const { noteState, noteDispatch } = NoteContainer.useContainer()
   const { activeTag } = noteState
   const { tagState } = TagContainer.useContainer()

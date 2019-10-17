@@ -1,9 +1,8 @@
 import { makeStyles } from '@material-ui/core/styles'
 import { Add, Delete, Description, Favorite, Settings } from '@material-ui/icons'
 import React from 'react'
-import uuid from 'uuid'
 import { NoteActionType, NoteContainer } from '../stores'
-import { FolderDict, Folders, Note } from '../types'
+import { FolderDict, Folders } from '../types'
 import TagList from './TagList'
 
 const useStyles = makeStyles({
@@ -83,15 +82,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const { activeFolder } = noteState
 
   const handleAddNode = () => {
-    const now = new Date().toISOString()
-    const newNote: Note = {
-      id: uuid.v4(),
-      content: '',
-      createAt: now,
-      updateAt: now,
-      tags: [],
-    }
-    noteDispatch({ type: NoteActionType.ADD_NOTE, payload: newNote })
+    noteDispatch({ type: NoteActionType.ADD_NOTE })
   }
 
   return (
