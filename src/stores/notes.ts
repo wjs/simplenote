@@ -1,6 +1,6 @@
 import { useReducer } from 'react'
 import { createContainer } from 'unstated-next'
-import { FolderKeys, Folders, Note, Tag } from '../types'
+import { FolderKeys, Folders, Note, NoteId, Tag } from '../types'
 
 export enum NoteActionType {
   CHOOSE_FOLDER = 'CHOOSE_FOLDER',
@@ -12,14 +12,14 @@ export enum NoteActionType {
 export type NoteAction =
   | { type: NoteActionType.CHOOSE_FOLDER; payload: FolderKeys }
   | { type: NoteActionType.CHOOSE_TAG; payload: Tag }
-  | { type: NoteActionType.CHOOSE_NOTE; payload: Tag }
+  | { type: NoteActionType.CHOOSE_NOTE; payload: NoteId }
   | { type: NoteActionType.ADD_NOTE; payload: Note }
 
 export interface NoteState {
   notes: Note[]
   activeFolder: FolderKeys
-  activeTag: Tag
-  activeNoteId: string
+  activeTag: Tag | null
+  activeNoteId: NoteId
   error: string
   loading: boolean
 }
@@ -27,7 +27,7 @@ export interface NoteState {
 export const initialNoteState: NoteState = {
   notes: [],
   activeFolder: Folders.ALL,
-  activeTag: '',
+  activeTag: null,
   activeNoteId: '',
   error: '',
   loading: false,
@@ -36,7 +36,7 @@ export const initialNoteState: NoteState = {
 export function notesReducer(state: NoteState, action: NoteAction): NoteState {
   switch (action.type) {
     case NoteActionType.CHOOSE_FOLDER:
-      return { ...state, activeFolder: action.payload, activeTag: '' }
+      return { ...state, activeFolder: action.payload, activeTag: null }
     case NoteActionType.CHOOSE_TAG:
       return { ...state, activeFolder: Folders.TAG, activeTag: action.payload }
     case NoteActionType.CHOOSE_NOTE:

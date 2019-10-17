@@ -1,42 +1,44 @@
 import { useReducer } from 'react'
 import { createContainer } from 'unstated-next'
-import { Tag } from '../types'
+import { Tag, TagId } from '../types'
+import uuid from 'uuid'
 
 export enum TagActionType {
-  SHOW_ADD_TAG_INPUT = 'SHOW_ADD_TAG_INPUT',
-  HIDE_ADD_TAG_INPUT = 'HIDE_ADD_TAG_INPUT',
   ADD_TAG = 'ADD_TAG',
   DEL_TAG = 'DEL_TAG',
+  EDIT_TAG = 'EDIT_TAG',
 }
 
 export type TagAction =
-  | { type: TagActionType.SHOW_ADD_TAG_INPUT }
-  | { type: TagActionType.HIDE_ADD_TAG_INPUT }
-  | { type: TagActionType.ADD_TAG; payload: Tag }
-  | { type: TagActionType.DEL_TAG; payload: Tag }
+  | { type: TagActionType.ADD_TAG; payload: string }
+  | { type: TagActionType.DEL_TAG; payload: TagId }
+  | { type: TagActionType.EDIT_TAG; payload: Tag }
 
 export interface TagState {
   tags: Tag[]
-  showAddTagInput: boolean
-  addTagValue: string
 }
 
 export const initialTagState: TagState = {
-  tags: ['aaa', 'bbb', 'ccc'],
-  showAddTagInput: false,
-  addTagValue: '',
+  tags: [
+    { id: uuid.v4(), name: 'aaa' },
+    { id: uuid.v4(), name: 'bbb' },
+    { id: uuid.v4(), name: 'ccc' },
+  ],
 }
 
 export function tagsReducer(state: TagState, action: TagAction): TagState {
   switch (action.type) {
-    case TagActionType.SHOW_ADD_TAG_INPUT:
-      return { ...state, showAddTagInput: true }
-    case TagActionType.HIDE_ADD_TAG_INPUT:
-      return { ...state, showAddTagInput: false }
     case TagActionType.ADD_TAG:
-      return { ...state, tags: [...state.tags, action.payload] }
+      const newTag = { id: uuid.v4(), name: action.payload }
+      return { ...state, tags: [...state.tags, newTag] }
     case TagActionType.DEL_TAG:
-      return { ...state, tags: state.tags.filter(x => x !== action.payload) }
+      return { ...state, tags: state.tags.filter(x => x.id !== action.payload) }
+    case TagActionType.EDIT_TAG:
+      const idx = state.tags.findIndex(x => x.id === action.payload.id)
+      return {
+        ...state,
+        tags: [...state.tags.slice(0, idx), action.payload, ...state.tags.slice(idx + 1)],
+      }
     default:
       return state
   }

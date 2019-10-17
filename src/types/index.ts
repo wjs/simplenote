@@ -13,8 +13,12 @@ export const FolderDict: { [key: string]: string } = {
   [Folders.TRASH]: 'Trash',
 }
 
+export type NoteId = string
+
+export type TagId = string
+
 export interface Note {
-  id: string
+  id: NoteId
   content: string
   createAt: string
   updateAt: string
@@ -24,6 +28,6 @@ export interface Note {
 }
 
 export interface Tag {
-  id: string
+  id: TagId
   name: string
 }

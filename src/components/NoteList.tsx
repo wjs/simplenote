@@ -29,7 +29,7 @@ const NoteList: React.FC<NoteListProps> = () => {
   return (
     <aside className={classes.root}>
       <div className={classes.noteListHeader}>
-        {activeFolder === Folders.TAG ? activeTag : FolderDict[activeFolder]}
+        {activeFolder === Folders.TAG ? activeTag && activeTag.name : FolderDict[activeFolder]}
       </div>
       <div className={classes.noteList}>
         {notes.map(item => (

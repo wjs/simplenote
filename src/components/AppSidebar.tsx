@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles'
-import { Add, BookmarkBorder, Delete, Description, Settings } from '@material-ui/icons'
+import { Add, Delete, Description, Favorite, Settings } from '@material-ui/icons'
 import React from 'react'
 import uuid from 'uuid'
 import { NoteActionType, NoteContainer } from '../stores'
@@ -66,7 +66,7 @@ const menus = [
   {
     key: Folders.FAVORITES,
     text: FolderDict[Folders.FAVORITES],
-    icon: BookmarkBorder,
+    icon: Favorite,
   },
   {
     key: Folders.TRASH,
