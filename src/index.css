@@ -21,3 +21,18 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+.hljs {
+  border-radius: 4px;
+  padding: 0.8em;
+}
+
+.CodeMirror {
+  height: 100%;
+  padding: 1rem;
+  line-height: 1.5;
+  font-family: Menlo, Monaco, monospace;
+  font-weight: 500;
+  font-size: 15px;
+  -webkit-font-smoothing: subpixel-antialiased;
+}
