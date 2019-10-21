@@ -37,12 +37,14 @@ export enum SettingActionType {
   TOGGLE_SETTING_DIALOG = 'TOGGLE_SETTING_DIALOG',
   TOGGLE_PREVIEW_MODE = 'TOGGLE_PREVIEW_MODE',
   TOGGLE_DARK_MODE = 'TOGGLE_DARK_MODE',
+  TOGGLE_LINE_NUMBERS = 'TOGGLE_LINE_NUMBERS',
 }
 
 export type SettingAction =
   | { type: SettingActionType.TOGGLE_SETTING_DIALOG }
   | { type: SettingActionType.TOGGLE_PREVIEW_MODE; payload?: boolean }
   | { type: SettingActionType.TOGGLE_DARK_MODE }
+  | { type: SettingActionType.TOGGLE_LINE_NUMBERS }
 
 function settingReducer(state: SettingState, action: SettingAction) {
   switch (action.type) {
@@ -60,6 +62,14 @@ function settingReducer(state: SettingState, action: SettingAction) {
         codeMirrorOptions: {
           ...state.codeMirrorOptions,
           theme: state.darkMode ? 'idea' : 'dracula',
+        },
+      }
+    case SettingActionType.TOGGLE_LINE_NUMBERS:
+      return {
+        ...state,
+        codeMirrorOptions: {
+          ...state.codeMirrorOptions,
+          lineNumbers: !state.codeMirrorOptions.lineNumbers,
         },
       }
     default:

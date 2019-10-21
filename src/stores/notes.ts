@@ -84,7 +84,10 @@ function notesReducer(state: NoteState, action: NoteAction): NoteState {
         createAt: now,
         updateAt: now,
       }
-      return { ...state, notes: [...state.notes, newNote] }
+      if (state.activeTag) {
+        newNote.tags.push(state.activeTag.id)
+      }
+      return { ...state, notes: [...state.notes, newNote], activeNoteId: newNote.id }
     case NoteActionType.EDIT_NOTE:
       const idx = state.notes.findIndex(x => x.id === state.activeNoteId)
       return {

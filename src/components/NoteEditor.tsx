@@ -26,6 +26,7 @@ const useStyle = makeStyles({
     maxHeight: '100vh',
     overflowY: 'auto',
     lineHeight: 1.5,
+    padding: '1rem',
     fontSize: '15px',
     fontFamily: 'Menlo,Monaco,monospace',
     '-webkit-font-smoothing': 'subpixel-antialiased',
@@ -49,9 +50,6 @@ const useStyle = makeStyles({
     '& h1, & h2, & h3, & h4, & h5, & h6': {
       color: '#ffd479',
     },
-  },
-  preview: {
-    padding: '1rem',
   },
 })
 
@@ -82,9 +80,7 @@ const NoteEditor: React.FC<NoteEditorProps> = () => {
   if (previewMode) {
     return (
       <div
-        className={`${classes.root} ${darkMode ? classes.dark : ''} ${
-          previewMode ? classes.preview : ''
-        }`}
+        className={`${classes.root} ${darkMode ? classes.dark : ''}`}
         dangerouslySetInnerHTML={{
           __html: DOMPurify.sanitize(marked(activeNote.content)),
         }}

@@ -49,7 +49,7 @@ interface SettingDialogProps {}
 const SettingDialog: React.FC<SettingDialogProps> = () => {
   const classes = useStyle()
   const { settingState, settingDispatch } = SettingContainer.useContainer()
-  const { isOpen, darkMode } = settingState
+  const { isOpen, darkMode, codeMirrorOptions } = settingState
 
   return (
     <Dialog
@@ -63,6 +63,14 @@ const SettingDialog: React.FC<SettingDialogProps> = () => {
           <Switch
             checked={darkMode}
             onChange={() => settingDispatch({ type: SettingActionType.TOGGLE_DARK_MODE })}
+            color="primary"
+          />
+        </div>
+        <div className={classes.settingItem}>
+          <div>Editor show line numbers</div>
+          <Switch
+            checked={codeMirrorOptions.lineNumbers}
+            onChange={() => settingDispatch({ type: SettingActionType.TOGGLE_LINE_NUMBERS })}
             color="primary"
           />
         </div>

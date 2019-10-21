@@ -29,7 +29,6 @@ code {
 
 .CodeMirror {
   height: 100%;
-  padding: 1rem;
   line-height: 1.5;
   font-family: Menlo, Monaco, monospace;
   font-weight: 500;

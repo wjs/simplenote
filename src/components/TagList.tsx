@@ -6,7 +6,7 @@ import { NoteActionType, NoteContainer, TagContainer } from '../stores'
 import { Tag } from '../types'
 import EditTagDialog from './EditTagDialog'
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   folderItem: {
     display: 'flex',
     alignItems: 'center',
@@ -20,7 +20,7 @@ const useStyles = makeStyles({
     '&.active': {
       backgroundColor: '#101010',
       '& $tagIcon': {
-        color: '#38b397',
+        color: theme.palette.primary.main,
       },
     },
   },
@@ -35,26 +35,33 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    height: '40px',
     marginTop: '1rem',
-    padding: '.5rem',
+    padding: '0 .5rem',
     '& h3': {
       margin: 0,
-      color: '#888',
-      fontSize: '0.8rem',
+      color: '#999',
+      fontSize: '0.85rem',
+    },
+    '&:hover': {
+      '& $editBtn': {
+        display: 'block',
+      },
     },
   },
   editBtn: {
+    display: 'none',
     padding: '.35rem',
-    color: 'rgba(255,255,255,.8)',
+    backgroundColor: '#292929',
+    color: 'inherit',
     '&:hover': {
-      backgroundColor: '#555',
-      color: '#fff',
+      color: theme.palette.primary.main,
     },
   },
   editIcon: {
     fontSize: '1rem',
   },
-})
+}))
 
 interface TagListProps {}
 
@@ -75,7 +82,12 @@ const TagList: React.FC<TagListProps> = () => {
       <div className={classes.tagTitle}>
         <h3>Tags</h3>
         <Tooltip title="Edit tags">
-          <IconButton size="small" className={classes.editBtn} onClick={() => setOpenEdit(true)}>
+          <IconButton
+            size="small"
+            color="primary"
+            className={classes.editBtn}
+            onClick={() => setOpenEdit(true)}
+          >
             <Edit className={classes.editIcon} />
           </IconButton>
         </Tooltip>

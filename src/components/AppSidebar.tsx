@@ -1,10 +1,11 @@
+import { IconButton } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { Add, Delete, Description, Favorite, Settings } from '@material-ui/icons'
+import { Add, Delete, Description, Settings, StarBorder } from '@material-ui/icons'
 import React from 'react'
-import { NoteActionType, NoteContainer, SettingContainer, SettingActionType } from '../stores'
+import { NoteActionType, NoteContainer, SettingActionType, SettingContainer } from '../stores'
 import { FolderDict, Folders } from '../types'
-import TagList from './TagList'
 import SettingDialog from './SettingDialog'
+import TagList from './TagList'
 
 const useStyles = makeStyles(theme => ({
   appSidebar: {
@@ -46,15 +47,10 @@ const useStyles = makeStyles(theme => ({
     margin: '.5rem 0',
   },
   bottomIcon: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
     margin: '0 .5rem',
-    padding: '.3rem',
-    borderRadius: '50%',
+    padding: '.5rem',
     backgroundColor: '#292929',
-    fontSize: '2.5rem',
-    cursor: 'pointer',
+    color: 'inherit',
     '&:hover': {
       color: theme.palette.primary.main,
     },
@@ -70,7 +66,7 @@ const menus = [
   {
     key: Folders.FAVORITES,
     text: FolderDict[Folders.FAVORITES],
-    icon: Favorite,
+    icon: StarBorder,
   },
   {
     key: Folders.TRASH,
@@ -89,6 +85,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
 
   const handleAddNode = () => {
     noteDispatch({ type: NoteActionType.ADD_NOTE })
+    settingDispatch({ type: SettingActionType.TOGGLE_PREVIEW_MODE, payload: false })
   }
 
   return (
@@ -106,11 +103,16 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
         <TagList />
       </section>
       <section className={classes.sidebarBottom}>
-        <Add className={classes.bottomIcon} onClick={handleAddNode} />
-        <Settings
+        <IconButton color="primary" className={classes.bottomIcon} onClick={handleAddNode}>
+          <Add />
+        </IconButton>
+        <IconButton
+          color="primary"
           className={classes.bottomIcon}
           onClick={() => settingDispatch({ type: SettingActionType.TOGGLE_SETTING_DIALOG })}
-        />
+        >
+          <Settings />
+        </IconButton>
         <SettingDialog />
       </section>
     </aside>
