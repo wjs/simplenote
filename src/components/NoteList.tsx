@@ -1,12 +1,30 @@
 import { makeStyles } from '@material-ui/core/styles'
 import React from 'react'
-import { NoteContainer, NoteActionType } from '../stores'
+import { NoteContainer, NoteActionType, SettingContainer } from '../stores'
 import { FolderDict, Folders } from '../types'
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   root: {
+    gridArea: 'note-list',
     background: '#e8e8e8',
     borderRight: '1px solid #ccc',
+  },
+  dark: {
+    backgroundColor: '#292929',
+    '& $noteListHeader': {
+      color: '#b7b7b7',
+    },
+    '& $noteItem': {
+      borderBottom: '1px solid #1f1f1f',
+      color: '#b7b7b7',
+      '&:hover': {
+        backgroundColor: '#3b3b3b',
+      },
+      '&.active': {
+        backgroundColor: theme.palette.primary.main,
+        color: '#fff',
+      },
+    },
   },
   noteListHeader: {
     padding: '0.5rem',
@@ -30,16 +48,18 @@ const useStyles = makeStyles({
       backgroundColor: '#dbdbdb',
     },
     '&.active': {
-      backgroundColor: '#38b397',
+      backgroundColor: theme.palette.primary.main,
       color: '#fff',
     },
   },
-})
+}))
 
 interface NoteListProps {}
 
 const NoteList: React.FC<NoteListProps> = () => {
   const classes = useStyles()
+  const { settingState } = SettingContainer.useContainer()
+  const { darkMode } = settingState
   const { noteState, noteDispatch } = NoteContainer.useContainer()
   const { activeFolder, activeTag, activeNoteId, notes } = noteState
   let displayNotes = notes.filter(x => !x.trash)
@@ -52,7 +72,7 @@ const NoteList: React.FC<NoteListProps> = () => {
   }
 
   return (
-    <aside className={classes.root}>
+    <aside className={`${classes.root} ${darkMode ? classes.dark : ''}`}>
       <div className={classes.noteListHeader}>
         {activeFolder === Folders.TAG ? activeTag && activeTag.name : FolderDict[activeFolder]}
       </div>

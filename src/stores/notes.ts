@@ -66,7 +66,7 @@ export const initialNoteState: NoteState = {
   loading: false,
 }
 
-export function notesReducer(state: NoteState, action: NoteAction): NoteState {
+function notesReducer(state: NoteState, action: NoteAction): NoteState {
   switch (action.type) {
     case NoteActionType.CHOOSE_FOLDER:
       return { ...state, activeFolder: action.payload, activeTag: null }

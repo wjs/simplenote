@@ -19,6 +19,9 @@ const useStyles = makeStyles({
     },
     '&.active': {
       backgroundColor: '#101010',
+      '& $tagIcon': {
+        color: '#38b397',
+      },
     },
   },
   tagIcon: {

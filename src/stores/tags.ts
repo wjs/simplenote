@@ -3,17 +3,6 @@ import { createContainer } from 'unstated-next'
 import { Tag, TagId } from '../types'
 import uuid from 'uuid'
 
-export enum TagActionType {
-  ADD_TAG = 'ADD_TAG',
-  DEL_TAG = 'DEL_TAG',
-  EDIT_TAG = 'EDIT_TAG',
-}
-
-export type TagAction =
-  | { type: TagActionType.ADD_TAG; payload: string }
-  | { type: TagActionType.DEL_TAG; payload: TagId }
-  | { type: TagActionType.EDIT_TAG; payload: Tag }
-
 export interface TagState {
   tags: Tag[]
 }
@@ -26,7 +15,18 @@ export const initialTagState: TagState = {
   ],
 }
 
-export function tagsReducer(state: TagState, action: TagAction): TagState {
+export enum TagActionType {
+  ADD_TAG = 'ADD_TAG',
+  DEL_TAG = 'DEL_TAG',
+  EDIT_TAG = 'EDIT_TAG',
+}
+
+export type TagAction =
+  | { type: TagActionType.ADD_TAG; payload: string }
+  | { type: TagActionType.DEL_TAG; payload: TagId }
+  | { type: TagActionType.EDIT_TAG; payload: Tag }
+
+function tagsReducer(state: TagState, action: TagAction): TagState {
   switch (action.type) {
     case TagActionType.ADD_TAG:
       const newTag = { id: uuid.v4(), name: action.payload }

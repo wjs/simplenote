@@ -3,15 +3,15 @@ import 'codemirror/addon/selection/active-line'
 import 'codemirror/keymap/vim'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/mode/gfm/gfm'
+import 'codemirror/theme/dracula.css'
 import 'codemirror/theme/idea.css'
 import DOMPurify from 'dompurify'
 import hljs from 'highlight.js' // from external cdn
 import marked from 'marked'
-import Mousetrap from 'mousetrap'
 import 'mousetrap/plugins/global-bind/mousetrap-global-bind'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Controlled as CodeMirror } from 'react-codemirror2'
-import { NoteActionType, NoteContainer } from '../stores'
+import { NoteActionType, NoteContainer, SettingContainer } from '../stores'
 
 marked.setOptions({
   langPrefix: 'hljs ',
@@ -20,26 +20,38 @@ marked.setOptions({
   },
 })
 
-const CodeMirrorOptions = {
-  mode: 'gfm',
-  theme: 'idea',
-  lineNumbers: false,
-  lineWrapping: true,
-  styleActiveLine: { nonEmpty: true },
-  viewportMargin: Infinity,
-  keyMap: 'default',
-  dragDrop: false,
-}
-
 const useStyle = makeStyles({
   root: {
-    height: '100%',
-    padding: '1rem',
+    gridArea: 'editor',
+    maxHeight: '100vh',
     overflowY: 'auto',
     lineHeight: 1.5,
     fontSize: '15px',
     fontFamily: 'Menlo,Monaco,monospace',
     '-webkit-font-smoothing': 'subpixel-antialiased',
+    '& a': {
+      color: '#5183f5',
+      textDecoration: 'none',
+      '&:hover': {
+        textDecoration: 'underline',
+      },
+    },
+    '& h1, & h2, & h3, & h4, & h5, & h6': {
+      margin: '0 0 1.5rem',
+    },
+  },
+  dark: {
+    backgroundColor: '#3f3f3f',
+    color: '#d0d0d0',
+    '& a': {
+      color: '#6ab0f3',
+    },
+    '& h1, & h2, & h3, & h4, & h5, & h6': {
+      color: '#ffd479',
+    },
+  },
+  preview: {
+    padding: '1rem',
   },
 })
 
@@ -47,7 +59,8 @@ interface NoteEditorProps {}
 
 const NoteEditor: React.FC<NoteEditorProps> = () => {
   const classes = useStyle()
-  const [isEdit, setIsEdit] = useState(false)
+  const { settingState } = SettingContainer.useContainer()
+  const { previewMode, darkMode, codeMirrorOptions } = settingState
   const { noteState, noteDispatch } = NoteContainer.useContainer()
   const { notes, activeNoteId } = noteState
 
@@ -59,15 +72,6 @@ const NoteEditor: React.FC<NoteEditorProps> = () => {
       }
       noteDispatch({ type: NoteActionType.CHOOSE_NOTE, payload: n.id })
     }
-
-    Mousetrap.bindGlobal('esc', function() {
-      setIsEdit(false)
-      return false
-    })
-    Mousetrap.bindGlobal('ctrl+e', function() {
-      setIsEdit(true)
-      return false
-    })
   })
 
   const activeNote = notes.find(x => x.id === activeNoteId)
@@ -75,44 +79,46 @@ const NoteEditor: React.FC<NoteEditorProps> = () => {
     return null
   }
 
-  if (isEdit) {
+  if (previewMode) {
     return (
-      <CodeMirror
-        onDragOver={(editor, event) => {
-          event.preventDefault()
-          console.log(editor)
+      <div
+        className={`${classes.root} ${darkMode ? classes.dark : ''} ${
+          previewMode ? classes.preview : ''
+        }`}
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify.sanitize(marked(activeNote.content)),
         }}
-        className="editor mousetrap"
-        value={activeNote.content}
-        options={CodeMirrorOptions}
-        editorDidMount={editor => {
-          editor.focus()
-          editor.setCursor(0)
-        }}
-        onBeforeChange={(editor, data, value) => {
-          noteDispatch({
-            type: NoteActionType.EDIT_NOTE,
-            payload: {
-              content: value,
-            },
-          })
-        }}
-        onChange={(editor, data, value) => {
-          if (activeNote && activeNote.content === '') {
-            editor.focus()
-          }
-        }}
-      />
+      ></div>
     )
   }
 
   return (
-    <div
-      className={classes.root}
-      dangerouslySetInnerHTML={{
-        __html: DOMPurify.sanitize(marked(activeNote.content)),
+    <CodeMirror
+      onDragOver={(editor, event) => {
+        event.preventDefault()
+        console.log(editor)
       }}
-    ></div>
+      className={classes.root}
+      value={activeNote.content}
+      options={codeMirrorOptions}
+      editorDidMount={editor => {
+        editor.focus()
+        editor.setCursor(0)
+      }}
+      onBeforeChange={(editor, data, value) => {
+        noteDispatch({
+          type: NoteActionType.EDIT_NOTE,
+          payload: {
+            content: value,
+          },
+        })
+      }}
+      onChange={(editor, data, value) => {
+        if (activeNote && activeNote.content === '') {
+          editor.focus()
+        }
+      }}
+    />
   )
 }
 

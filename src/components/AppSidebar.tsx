@@ -1,12 +1,14 @@
 import { makeStyles } from '@material-ui/core/styles'
 import { Add, Delete, Description, Favorite, Settings } from '@material-ui/icons'
 import React from 'react'
-import { NoteActionType, NoteContainer } from '../stores'
+import { NoteActionType, NoteContainer, SettingContainer, SettingActionType } from '../stores'
 import { FolderDict, Folders } from '../types'
 import TagList from './TagList'
+import SettingDialog from './SettingDialog'
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   appSidebar: {
+    gridArea: 'app-sidebar',
     display: 'flex',
     flexDirection: 'column',
     padding: '1rem 0 0.25rem',
@@ -28,6 +30,9 @@ const useStyles = makeStyles({
     },
     '&.active': {
       backgroundColor: '#101010',
+      '& $folderIcon': {
+        color: theme.palette.primary.main,
+      },
     },
   },
   folderIcon: {
@@ -51,10 +56,10 @@ const useStyles = makeStyles({
     fontSize: '2.5rem',
     cursor: 'pointer',
     '&:hover': {
-      color: 'green',
+      color: theme.palette.primary.main,
     },
   },
-})
+}))
 
 const menus = [
   {
@@ -78,6 +83,7 @@ interface AppSidebarProps {}
 
 const AppSidebar: React.FC<AppSidebarProps> = () => {
   const classes = useStyles()
+  const { settingDispatch } = SettingContainer.useContainer()
   const { noteState, noteDispatch } = NoteContainer.useContainer()
   const { activeFolder } = noteState
 
@@ -101,7 +107,11 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
       </section>
       <section className={classes.sidebarBottom}>
         <Add className={classes.bottomIcon} onClick={handleAddNode} />
-        <Settings className={classes.bottomIcon} />
+        <Settings
+          className={classes.bottomIcon}
+          onClick={() => settingDispatch({ type: SettingActionType.TOGGLE_SETTING_DIALOG })}
+        />
+        <SettingDialog />
       </section>
     </aside>
   )
