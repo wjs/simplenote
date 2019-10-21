@@ -1,4 +1,4 @@
-import { IconButton, Tooltip, Popover, Typography } from '@material-ui/core'
+import { IconButton, Popover, Tooltip } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { Favorite, FavoriteBorder, MoreVert } from '@material-ui/icons'
 import 'codemirror/addon/selection/active-line'
@@ -11,8 +11,7 @@ import hljs from 'highlight.js' // from external cdn
 import marked from 'marked'
 import React, { useEffect, useState } from 'react'
 import { Controlled as CodeMirror } from 'react-codemirror2'
-import { NoteActionType, NoteContainer, SettingContainer, TagContainer } from '../stores'
-import { Tag } from '../types'
+import { NoteActionType, NoteContainer, SettingContainer } from '../stores'
 import ChooseTagMenu from './ChooseTagMenu'
 
 marked.setOptions({
@@ -40,6 +39,7 @@ const useStyle = makeStyles({
     },
     '& h1, & h2, & h3, & h4, & h5, & h6': {
       margin: '0 0 1.5rem',
+      color: '#f05e23',
     },
   },
   dark: {
@@ -51,6 +51,16 @@ const useStyle = makeStyles({
     '& h1, & h2, & h3, & h4, & h5, & h6': {
       color: '#ffd479',
     },
+    '& $statusBar': {
+      backgroundColor: '#111',
+      color: '#d0d0d0',
+    },
+    '& $statusBtn': {
+      color: '#d0d0d0',
+    },
+    '& $tag': {
+      backgroundColor: '#626262',
+    },
   },
   editor: {
     height: 'calc(100vh - 40px - 1rem)',
@@ -61,6 +71,15 @@ const useStyle = makeStyles({
     height: '40px',
     marginLeft: '-1rem',
     padding: '0 1rem',
+    boxShadow: '0px -1px 1px 0px rgba(0,0,0,0.1)',
+  },
+  statusBtn: {},
+  tag: {
+    height: '24px',
+    lineHeight: '24px',
+    padding: '0 .8rem',
+    marginLeft: '1rem',
+    borderRadius: '12px',
     backgroundColor: '#e8e8e8',
   },
 })
@@ -72,8 +91,6 @@ const NoteEditor: React.FC<NoteEditorProps> = () => {
   const [tagMenuAnchorEl, setTagMenuAnchorEl] = useState<HTMLButtonElement | null>(null)
   const { settingState } = SettingContainer.useContainer()
   const { previewMode, darkMode, codeMirrorOptions } = settingState
-  const { tagState } = TagContainer.useContainer()
-  const { tags } = tagState
   const { noteState, noteDispatch } = NoteContainer.useContainer()
   const { notes, activeNoteId } = noteState
 
@@ -93,10 +110,10 @@ const NoteEditor: React.FC<NoteEditorProps> = () => {
   }
 
   return (
-    <div className={classes.root}>
+    <div className={`${classes.root} ${darkMode ? classes.dark : ''}`}>
       {previewMode ? (
         <div
-          className={`${classes.editor} ${darkMode ? classes.dark : ''}`}
+          className={`${classes.editor}`}
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(marked(activeNote.content)),
           }}
@@ -106,7 +123,7 @@ const NoteEditor: React.FC<NoteEditorProps> = () => {
           onDragOver={(editor, event) => {
             event.preventDefault()
           }}
-          className={`${classes.editor} ${darkMode ? classes.dark : ''}`}
+          className={`${classes.editor}`}
           value={activeNote.content}
           options={codeMirrorOptions}
           editorDidMount={editor => {
@@ -132,6 +149,7 @@ const NoteEditor: React.FC<NoteEditorProps> = () => {
         <Tooltip title={activeNote.favorite ? 'Remove favorite' : 'Mark as favorite'}>
           <IconButton
             size="small"
+            className={classes.statusBtn}
             onClick={() =>
               noteDispatch({
                 type: NoteActionType.EDIT_NOTE,
@@ -142,15 +160,15 @@ const NoteEditor: React.FC<NoteEditorProps> = () => {
             {activeNote.favorite ? <Favorite color="secondary" /> : <FavoriteBorder />}
           </IconButton>
         </Tooltip>
-        {activeNote.tags.length ? (
-          <div>
-            Tags:
-            {activeNote.tags.map(tag => (
-              <span key={tag}>{tag}</span>
-            ))}
-          </div>
-        ) : null}
+        {activeNote.tags.length
+          ? activeNote.tags.map(tag => (
+              <div key={tag} className={classes.tag}>
+                {tag}
+              </div>
+            ))
+          : null}
         <IconButton
+          className={classes.statusBtn}
           aria-describedby="choose-tag-menu"
           onClick={e => setTagMenuAnchorEl(e.currentTarget)}
         >
@@ -162,12 +180,12 @@ const NoteEditor: React.FC<NoteEditorProps> = () => {
           anchorEl={tagMenuAnchorEl}
           onClose={() => setTagMenuAnchorEl(null)}
           anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
+            vertical: 'top',
+            horizontal: 'left',
           }}
           transformOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
+            vertical: 'bottom',
+            horizontal: 'left',
           }}
         >
           <ChooseTagMenu note={activeNote} />

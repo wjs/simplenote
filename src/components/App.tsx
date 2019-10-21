@@ -33,11 +33,11 @@ const App: React.FC = () => {
       settingDispatch({ type: SettingActionType.TOGGLE_PREVIEW_MODE, payload: true })
       return false
     })
-    Mousetrap.bindGlobal('ctrl+e', function() {
+    Mousetrap.bindGlobal(['ctrl+e', 'command+e'], function() {
       settingDispatch({ type: SettingActionType.TOGGLE_PREVIEW_MODE, payload: false })
       return false
     })
-    Mousetrap.bindGlobal('ctrl+d', function() {
+    Mousetrap.bindGlobal(['ctrl+d', 'command+d'], function() {
       settingDispatch({ type: SettingActionType.TOGGLE_DARK_MODE })
       return false
     })

@@ -1,52 +1,12 @@
-import React from 'react'
+import { Checkbox, FormControlLabel } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { TagContainer, NoteContainer, NoteActionType } from '../stores'
-import { Tag, Note } from '../types'
-import { Label, DeleteForever, Edit } from '@material-ui/icons'
-import { FormControlLabel, Checkbox } from '@material-ui/core'
+import React from 'react'
+import { NoteActionType, NoteContainer, TagContainer } from '../stores'
+import { Note, Tag } from '../types'
 
 const useStyles = makeStyles({
-  dialogTitle: {
-    paddingBottom: 0,
-    marginBottom: '-1px',
-    borderBottom: '1px solid #fff',
-    zIndex: 10,
-  },
-  icon: {
-    marginRight: '.5rem',
-    fontSize: '1.25rem',
-    opacity: 0.54,
-    '&:hover': {
-      opacity: 0.8,
-    },
-  },
-  folderItem: {
-    display: 'flex',
-    alignItems: 'center',
-    '&:hover': {
-      '& $tagIcon': {
-        display: 'none',
-      },
-      '& $delIcon': {
-        display: 'block',
-      },
-      '& $editIcon': {
-        display: 'block',
-      },
-    },
-  },
-  tagIcon: {},
-  delIcon: {
-    display: 'none',
-  },
-  editIcon: {
-    display: 'none',
-    fontSize: '1.1rem',
-  },
-  tagText: {
-    flexGrow: 1,
-    padding: '.5rem 0',
-    fontWeight: 600,
+  root: {
+    padding: '.5rem 1rem',
   },
   tagInput: {
     '& .MuiInput-underline:after': {
@@ -56,6 +16,9 @@ const useStyles = makeStyles({
   tagInputInner: {
     padding: '.5rem .8rem',
   },
+  option: {
+    display: 'block',
+  },
 })
 interface ChooseTagMenuProps {
   note: Note
@@ -64,7 +27,7 @@ interface ChooseTagMenuProps {
 const ChooseTagMenu: React.FC<ChooseTagMenuProps> = ({ note }) => {
   const classes = useStyles()
   const { noteDispatch } = NoteContainer.useContainer()
-  const { tagState, tagDispatch } = TagContainer.useContainer()
+  const { tagState } = TagContainer.useContainer()
   const { tags } = tagState
 
   const handleSelect = (tag: Tag) => (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
@@ -78,12 +41,13 @@ const ChooseTagMenu: React.FC<ChooseTagMenuProps> = ({ note }) => {
   }
 
   return (
-    <div>
+    <div className={classes.root}>
       {tags.map((item: Tag, i: number) => {
         const checked = note.tags.indexOf(item) > -1
         return (
           <FormControlLabel
             key={i}
+            className={classes.option}
             control={<Checkbox checked={checked} onChange={handleSelect(item)} value={item} />}
             label={item}
           />
