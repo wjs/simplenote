@@ -15,8 +15,6 @@ export const FolderDict: { [key: string]: string } = {
 
 export type NoteId = string
 
-export type TagId = string
-
 export interface Note {
   id: NoteId
   title: string
@@ -28,7 +26,4 @@ export interface Note {
   trash?: boolean
 }
 
-export interface Tag {
-  id: TagId
-  name: string
-}
+export type Tag = string

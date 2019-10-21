@@ -1,6 +1,6 @@
 import { IconButton } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { Add, Delete, Description, Settings, StarBorder } from '@material-ui/icons'
+import { Add, Delete, Description, Favorite, Settings } from '@material-ui/icons'
 import React from 'react'
 import { NoteActionType, NoteContainer, SettingActionType, SettingContainer } from '../stores'
 import { FolderDict, Folders } from '../types'
@@ -66,7 +66,7 @@ const menus = [
   {
     key: Folders.FAVORITES,
     text: FolderDict[Folders.FAVORITES],
-    icon: StarBorder,
+    icon: Favorite,
   },
   {
     key: Folders.TRASH,

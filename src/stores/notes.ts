@@ -85,7 +85,7 @@ function notesReducer(state: NoteState, action: NoteAction): NoteState {
         updateAt: now,
       }
       if (state.activeTag) {
-        newNote.tags.push(state.activeTag.id)
+        newNote.tags.push(state.activeTag)
       }
       return { ...state, notes: [...state.notes, newNote], activeNoteId: newNote.id }
     case NoteActionType.EDIT_NOTE:

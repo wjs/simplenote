@@ -96,12 +96,12 @@ const TagList: React.FC<TagListProps> = () => {
       <div>
         {tags.map(item => (
           <div
-            key={item.id}
+            key={item}
             className={`${classes.folderItem} ${activeTag === item ? 'active' : ''}`}
             onClick={handleChooseTag(item)}
           >
             <Label className={`${classes.tagIcon} tag-icon`} />
-            <span className={classes.tagText}>{item.name}</span>
+            <span className={classes.tagText}>{item}</span>
           </div>
         ))}
 

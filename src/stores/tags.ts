@@ -1,18 +1,13 @@
 import { useReducer } from 'react'
 import { createContainer } from 'unstated-next'
-import { Tag, TagId } from '../types'
-import uuid from 'uuid'
+import { Tag } from '../types'
 
 export interface TagState {
   tags: Tag[]
 }
 
 export const initialTagState: TagState = {
-  tags: [
-    { id: uuid.v4(), name: 'aaa' },
-    { id: uuid.v4(), name: 'bbb' },
-    { id: uuid.v4(), name: 'ccc' },
-  ],
+  tags: ['aaa', 'bbb', 'ccc'],
 }
 
 export enum TagActionType {
@@ -23,21 +18,20 @@ export enum TagActionType {
 
 export type TagAction =
   | { type: TagActionType.ADD_TAG; payload: string }
-  | { type: TagActionType.DEL_TAG; payload: TagId }
-  | { type: TagActionType.EDIT_TAG; payload: Tag }
+  | { type: TagActionType.DEL_TAG; payload: Tag }
+  | { type: TagActionType.EDIT_TAG; payload: { index: number; newTag: Tag } }
 
 function tagsReducer(state: TagState, action: TagAction): TagState {
   switch (action.type) {
     case TagActionType.ADD_TAG:
-      const newTag = { id: uuid.v4(), name: action.payload }
-      return { ...state, tags: [...state.tags, newTag] }
+      return { ...state, tags: [...state.tags, action.payload] }
     case TagActionType.DEL_TAG:
-      return { ...state, tags: state.tags.filter(x => x.id !== action.payload) }
+      return { ...state, tags: state.tags.filter(x => x !== action.payload) }
     case TagActionType.EDIT_TAG:
-      const idx = state.tags.findIndex(x => x.id === action.payload.id)
+      const { index, newTag } = action.payload
       return {
         ...state,
-        tags: [...state.tags.slice(0, idx), action.payload, ...state.tags.slice(idx + 1)],
+        tags: [...state.tags.slice(0, index), newTag, ...state.tags.slice(index + 1)],
       }
     default:
       return state

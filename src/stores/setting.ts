@@ -61,7 +61,7 @@ function settingReducer(state: SettingState, action: SettingAction) {
         darkMode: !state.darkMode,
         codeMirrorOptions: {
           ...state.codeMirrorOptions,
-          theme: state.darkMode ? 'idea' : 'dracula',
+          theme: state.darkMode ? 'idea' : 'darcula',
         },
       }
     case SettingActionType.TOGGLE_LINE_NUMBERS:

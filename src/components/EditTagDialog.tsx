@@ -74,8 +74,8 @@ const EditTagDialog: React.FC<EditTagDialogProps> = ({ open, handleClose }) => {
   const classes = useStyles()
   const [addValue, setAddValue] = useState('')
   const [editValue, setEditValue] = useState('')
-  const [editTagId, setEditTagId] = useState('')
-  const [tagToBeDel, setTagToBeDel] = useState<Tag | null>(null)
+  const [editTagIndex, setEditTagIndex] = useState(-1)
+  const [tagToBeDel, setTagToBeDel] = useState('')
   const [openDel, setOpenDel] = useState(false)
   const { noteState, noteDispatch } = NoteContainer.useContainer()
   const { activeTag } = noteState
@@ -83,18 +83,21 @@ const EditTagDialog: React.FC<EditTagDialogProps> = ({ open, handleClose }) => {
   const { tags } = tagState
 
   const submit = () => {
-    const val = editTagId ? editValue.trim() : addValue.trim()
+    const val = editTagIndex > -1 ? editValue.trim() : addValue.trim()
     if (val) {
-      const t = tags.find(x => x.name === val)
-      if (editTagId) {
+      const t = tags.find(x => x === val)
+      if (editTagIndex > -1) {
         // edit tag
         if (!t) {
-          tagDispatch({ type: TagActionType.EDIT_TAG, payload: { id: editTagId, name: val } })
-        } else if (t && t.id !== editTagId) {
+          tagDispatch({
+            type: TagActionType.EDIT_TAG,
+            payload: { index: editTagIndex, newTag: val },
+          })
+        } else if (t && t !== tags[editTagIndex]) {
           // TODO: toastr error message
           console.log('duplicate tag')
         }
-        setEditTagId('')
+        setEditTagIndex(-1)
       } else {
         // add new tag
         if (!t) {
@@ -105,7 +108,7 @@ const EditTagDialog: React.FC<EditTagDialogProps> = ({ open, handleClose }) => {
         }
       }
     }
-    editTagId ? setEditValue('') : setAddValue('')
+    editTagIndex > -1 ? setEditValue('') : setAddValue('')
   }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -122,7 +125,7 @@ const EditTagDialog: React.FC<EditTagDialogProps> = ({ open, handleClose }) => {
 
   const handleConfirmDelTag = () => {
     if (tagToBeDel) {
-      tagDispatch({ type: TagActionType.DEL_TAG, payload: tagToBeDel.id })
+      tagDispatch({ type: TagActionType.DEL_TAG, payload: tagToBeDel })
     }
     setOpenDel(false)
     if (activeTag === tagToBeDel) {
@@ -130,9 +133,9 @@ const EditTagDialog: React.FC<EditTagDialogProps> = ({ open, handleClose }) => {
     }
   }
 
-  const handleEdit = (tag: Tag) => () => {
-    setEditValue(tag.name)
-    setEditTagId(tag.id)
+  const handleEdit = (idx: number) => () => {
+    setEditValue(tags[idx])
+    setEditTagIndex(idx)
   }
 
   return (
@@ -155,9 +158,9 @@ const EditTagDialog: React.FC<EditTagDialogProps> = ({ open, handleClose }) => {
         </DialogTitle>
         <DialogContent dividers>
           <div>
-            {tags.map(item => (
-              <div key={item.id} className={classes.folderItem}>
-                {editTagId === item.id ? (
+            {tags.map((item: Tag, i: number) => (
+              <div key={item} className={classes.folderItem}>
+                {editTagIndex === i ? (
                   <TextField
                     autoFocus
                     className={classes.tagInput}
@@ -177,10 +180,10 @@ const EditTagDialog: React.FC<EditTagDialogProps> = ({ open, handleClose }) => {
                       className={`${classes.icon} ${classes.delIcon}`}
                       onClick={handleDelTag(item)}
                     />
-                    <div className={classes.tagText}>{item.name}</div>
+                    <div className={classes.tagText}>{item}</div>
                     <Edit
                       className={`${classes.icon} ${classes.editIcon}`}
-                      onClick={handleEdit(item)}
+                      onClick={handleEdit(i)}
                     />
                   </>
                 )}
@@ -197,7 +200,7 @@ const EditTagDialog: React.FC<EditTagDialogProps> = ({ open, handleClose }) => {
 
       <Dialog disableBackdropClick maxWidth="xs" open={openDel}>
         <DialogContent>
-          Are you sure want to delete tag: <strong>{tagToBeDel && tagToBeDel.name}</strong> ?
+          Are you sure want to delete tag: <strong>{tagToBeDel}</strong> ?
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDel(false)} color="default">

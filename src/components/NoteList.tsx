@@ -68,13 +68,13 @@ const NoteList: React.FC<NoteListProps> = () => {
   } else if (activeFolder === Folders.TRASH) {
     displayNotes = notes.filter(x => x.trash)
   } else if (activeFolder === Folders.TAG && activeTag) {
-    displayNotes = displayNotes.filter(x => x.tags.indexOf(activeTag.id) > -1)
+    displayNotes = displayNotes.filter(x => x.tags.indexOf(activeTag) > -1)
   }
 
   return (
     <aside className={`${classes.root} ${darkMode ? classes.dark : ''}`}>
       <div className={classes.noteListHeader}>
-        {activeFolder === Folders.TAG ? activeTag && activeTag.name : FolderDict[activeFolder]}
+        {activeFolder === Folders.TAG ? activeTag : FolderDict[activeFolder]}
       </div>
       <div className={classes.noteList}>
         {displayNotes.map(item => (

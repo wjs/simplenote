@@ -35,3 +35,9 @@ code {
   font-size: 15px;
   -webkit-font-smoothing: subpixel-antialiased;
 }
+
+.v-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

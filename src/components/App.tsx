@@ -1,5 +1,6 @@
 import { createMuiTheme, makeStyles, MuiThemeProvider } from '@material-ui/core/styles'
 import Mousetrap from 'mousetrap'
+import 'mousetrap/plugins/global-bind/mousetrap-global-bind'
 import React, { useEffect } from 'react'
 import { NoteContainer, SettingActionType, SettingContainer, TagContainer } from '../stores'
 import AppSidebar from './AppSidebar'
@@ -45,13 +46,13 @@ const App: React.FC = () => {
   return (
     <div className={classes.root}>
       <NoteContainer.Provider>
-        <MuiThemeProvider theme={theme}>
-          <TagContainer.Provider>
+        <TagContainer.Provider>
+          <MuiThemeProvider theme={theme}>
             <AppSidebar />
-          </TagContainer.Provider>
-          <NoteList />
-          <NoteEditor />
-        </MuiThemeProvider>
+            <NoteList />
+            <NoteEditor />
+          </MuiThemeProvider>
+        </TagContainer.Provider>
       </NoteContainer.Provider>
     </div>
   )
