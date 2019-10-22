@@ -26,7 +26,7 @@ const useStyle = makeStyles({
     gridArea: 'editor',
     height: '100vh',
     lineHeight: 1.5,
-    padding: '1rem 0 1rem 1rem',
+    padding: '1rem 0 40px 1rem',
     fontSize: '15px',
     fontFamily: 'Menlo,Monaco,monospace',
     '-webkit-font-smoothing': 'subpixel-antialiased',
@@ -65,6 +65,7 @@ const useStyle = makeStyles({
   editor: {
     height: 'calc(100vh - 40px - 1rem)',
     overflowY: 'auto',
+    paddingBottom: '1rem',
   },
   statusBar: {
     justifyContent: 'flex-start',
@@ -73,7 +74,9 @@ const useStyle = makeStyles({
     padding: '0 1rem',
     boxShadow: '0px -1px 1px 0px rgba(0,0,0,0.1)',
   },
-  statusBtn: {},
+  statusBtn: {
+    maxHeight: '40px',
+  },
   tag: {
     height: '24px',
     lineHeight: '24px',
@@ -115,7 +118,7 @@ const NoteEditor: React.FC<NoteEditorProps> = () => {
         <div
           className={`${classes.editor}`}
           dangerouslySetInnerHTML={{
-            __html: DOMPurify.sanitize(marked(activeNote.content)),
+            __html: DOMPurify.sanitize(marked(activeNote.text)),
           }}
         ></div>
       ) : (
@@ -124,7 +127,7 @@ const NoteEditor: React.FC<NoteEditorProps> = () => {
             event.preventDefault()
           }}
           className={`${classes.editor}`}
-          value={activeNote.content}
+          value={activeNote.text}
           options={codeMirrorOptions}
           editorDidMount={editor => {
             editor.focus()
@@ -134,12 +137,12 @@ const NoteEditor: React.FC<NoteEditorProps> = () => {
             noteDispatch({
               type: NoteActionType.EDIT_NOTE,
               payload: {
-                content: value,
+                text: value,
               },
             })
           }}
           onChange={(editor, data, value) => {
-            if (activeNote && activeNote.content === '') {
+            if (activeNote && activeNote.text === '') {
               editor.focus()
             }
           }}

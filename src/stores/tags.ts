@@ -14,12 +14,14 @@ export enum TagActionType {
   ADD_TAG = 'ADD_TAG',
   DEL_TAG = 'DEL_TAG',
   EDIT_TAG = 'EDIT_TAG',
+  LOAD_TAGS = 'LOAD_TAGS',
 }
 
 export type TagAction =
   | { type: TagActionType.ADD_TAG; payload: string }
   | { type: TagActionType.DEL_TAG; payload: Tag }
   | { type: TagActionType.EDIT_TAG; payload: { index: number; newTag: Tag } }
+  | { type: TagActionType.LOAD_TAGS; payload: Tag[] }
 
 function tagsReducer(state: TagState, action: TagAction): TagState {
   switch (action.type) {
@@ -33,6 +35,8 @@ function tagsReducer(state: TagState, action: TagAction): TagState {
         ...state,
         tags: [...state.tags.slice(0, index), newTag, ...state.tags.slice(index + 1)],
       }
+    case TagActionType.LOAD_TAGS:
+      return { ...state, tags: action.payload }
     default:
       return state
   }

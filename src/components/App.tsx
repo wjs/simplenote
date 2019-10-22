@@ -2,16 +2,25 @@ import { createMuiTheme, makeStyles, MuiThemeProvider } from '@material-ui/core/
 import Mousetrap from 'mousetrap'
 import 'mousetrap/plugins/global-bind/mousetrap-global-bind'
 import React, { useEffect } from 'react'
-import { NoteContainer, SettingActionType, SettingContainer, TagContainer } from '../stores'
+import {
+  NoteContainer,
+  SettingActionType,
+  SettingContainer,
+  TagContainer,
+  NoteActionType,
+  TagActionType,
+} from '../stores'
 import AppSidebar from './AppSidebar'
 import NoteEditor from './NoteEditor'
 import NoteList from './NoteList'
+import { useInterval } from '../utils'
+import { saveData, getNotes, getTags } from '../api'
 
 const useStyles = makeStyles({
   root: {
     display: 'grid',
     gridTemplateAreas: `'app-sidebar note-list editor'`,
-    gridTemplateColumns: '200px 300px auto',
+    gridTemplateColumns: '150px 300px auto',
     height: '100vh',
   },
 })
@@ -27,6 +36,8 @@ const theme = createMuiTheme({
 const App: React.FC = () => {
   const classes = useStyles()
   const { settingDispatch } = SettingContainer.useContainer()
+  const { noteState, noteDispatch } = NoteContainer.useContainer()
+  const { tagState, tagDispatch } = TagContainer.useContainer()
 
   useEffect(() => {
     Mousetrap.bindGlobal('esc', function() {
@@ -41,19 +52,35 @@ const App: React.FC = () => {
       settingDispatch({ type: SettingActionType.TOGGLE_DARK_MODE })
       return false
     })
+    Mousetrap.bindGlobal(['ctrl+alt+n', 'command+alt+n'], function() {
+      noteDispatch({ type: NoteActionType.ADD_NOTE })
+      return false
+    })
   })
+
+  useEffect(() => {
+    getNotes().then(res => {
+      noteDispatch({ type: NoteActionType.LOAD_NOTES, payload: res })
+    })
+  }, [noteDispatch])
+
+  useEffect(() => {
+    getTags().then(res => {
+      tagDispatch({ type: TagActionType.LOAD_TAGS, payload: res })
+    })
+  }, [tagDispatch])
+
+  useInterval(() => {
+    saveData(noteState.notes, tagState.tags)
+  }, 20000)
 
   return (
     <div className={classes.root}>
-      <NoteContainer.Provider>
-        <TagContainer.Provider>
-          <MuiThemeProvider theme={theme}>
-            <AppSidebar />
-            <NoteList />
-            <NoteEditor />
-          </MuiThemeProvider>
-        </TagContainer.Provider>
-      </NoteContainer.Provider>
+      <MuiThemeProvider theme={theme}>
+        <AppSidebar />
+        <NoteList />
+        <NoteEditor />
+      </MuiThemeProvider>
     </div>
   )
 }

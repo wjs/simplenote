@@ -1,7 +1,8 @@
 import { makeStyles } from '@material-ui/core/styles'
 import React from 'react'
-import { NoteContainer, NoteActionType, SettingContainer } from '../stores'
+import { NoteActionType, NoteContainer, SettingContainer } from '../stores'
 import { FolderDict, Folders } from '../types'
+import { getNoteTitle } from '../utils'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -83,7 +84,7 @@ const NoteList: React.FC<NoteListProps> = () => {
             className={`${classes.noteItem} ${activeNoteId === item.id ? 'active' : ''}`}
             onClick={() => noteDispatch({ type: NoteActionType.CHOOSE_NOTE, payload: item.id })}
           >
-            {item.title}
+            {getNoteTitle(item.text)}
           </div>
         ))}
       </div>
