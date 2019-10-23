@@ -1,6 +1,4 @@
 import { createMuiTheme, makeStyles, MuiThemeProvider } from '@material-ui/core/styles'
-import Mousetrap from 'mousetrap'
-import 'mousetrap/plugins/global-bind/mousetrap-global-bind'
 import React, { useEffect } from 'react'
 import {
   NoteContainer,
@@ -13,7 +11,7 @@ import {
 import AppSidebar from './AppSidebar'
 import NoteEditor from './NoteEditor'
 import NoteList from './NoteList'
-import { useInterval } from '../utils'
+import { useInterval, useKey } from '../utils'
 import { saveData, getNotes, getTags } from '../api'
 
 const useStyles = makeStyles({
@@ -39,28 +37,29 @@ const App: React.FC = () => {
   const { noteState, noteDispatch } = NoteContainer.useContainer()
   const { tagState, tagDispatch } = TagContainer.useContainer()
 
-  useEffect(() => {
-    Mousetrap.bindGlobal('esc', function() {
-      settingDispatch({ type: SettingActionType.TOGGLE_PREVIEW_MODE, payload: true })
-      return false
-    })
-    Mousetrap.bindGlobal(['ctrl+e', 'command+e'], function() {
-      settingDispatch({ type: SettingActionType.TOGGLE_PREVIEW_MODE, payload: false })
-      return false
-    })
-    Mousetrap.bindGlobal(['ctrl+d', 'command+d'], function() {
-      settingDispatch({ type: SettingActionType.TOGGLE_DARK_MODE })
-      return false
-    })
-    Mousetrap.bindGlobal(['ctrl+alt+n', 'command+alt+n'], function() {
-      noteDispatch({ type: NoteActionType.ADD_NOTE })
-      return false
-    })
+  useKey('esc', () => {
+    settingDispatch({ type: SettingActionType.TOGGLE_PREVIEW_MODE, payload: true })
+  })
+  useKey('g e', () => {
+    settingDispatch({ type: SettingActionType.TOGGLE_PREVIEW_MODE, payload: false })
+  })
+  useKey('g d', () => {
+    settingDispatch({ type: SettingActionType.TOGGLE_DARK_MODE })
+  })
+  useKey('g n', () => {
+    noteDispatch({ type: NoteActionType.ADD_NOTE })
+    settingDispatch({ type: SettingActionType.TOGGLE_PREVIEW_MODE, payload: false })
+  })
+  useKey(['ctrl+s', 'command+s'], () => {
+    saveData(noteState.notes, tagState.tags)
   })
 
   useEffect(() => {
     getNotes().then(res => {
       noteDispatch({ type: NoteActionType.LOAD_NOTES, payload: res })
+      if (res && res.length) {
+        noteDispatch({ type: NoteActionType.CHOOSE_NOTE, payload: res[0].id })
+      }
     })
   }, [noteDispatch])
 
