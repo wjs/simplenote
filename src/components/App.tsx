@@ -1,18 +1,18 @@
 import { createMuiTheme, makeStyles, MuiThemeProvider } from '@material-ui/core/styles'
 import React, { useEffect } from 'react'
+import { getInit, saveData } from '../api'
 import {
+  NoteActionType,
   NoteContainer,
   SettingActionType,
   SettingContainer,
-  TagContainer,
-  NoteActionType,
   TagActionType,
+  TagContainer,
 } from '../stores'
+import { useInterval, useKey } from '../utils'
 import AppSidebar from './AppSidebar'
 import NoteEditor from './NoteEditor'
 import NoteList from './NoteList'
-import { useInterval, useKey } from '../utils'
-import { saveData, getNotes, getTags } from '../api'
 
 const useStyles = makeStyles({
   root: {
@@ -55,19 +55,15 @@ const App: React.FC = () => {
   })
 
   useEffect(() => {
-    getNotes().then(res => {
-      noteDispatch({ type: NoteActionType.LOAD_NOTES, payload: res })
-      if (res && res.length) {
-        noteDispatch({ type: NoteActionType.CHOOSE_NOTE, payload: res[0].id })
+    getInit().then(res => {
+      const { notes, tags, activeNoteId } = res
+      noteDispatch({ type: NoteActionType.LOAD_NOTES, payload: notes })
+      tagDispatch({ type: TagActionType.LOAD_TAGS, payload: tags })
+      if (activeNoteId) {
+        noteDispatch({ type: NoteActionType.CHOOSE_NOTE, payload: activeNoteId })
       }
     })
-  }, [noteDispatch])
-
-  useEffect(() => {
-    getTags().then(res => {
-      tagDispatch({ type: TagActionType.LOAD_TAGS, payload: res })
-    })
-  }, [tagDispatch])
+  }, [noteDispatch, tagDispatch])
 
   useInterval(() => {
     saveData(noteState.notes, tagState.tags)
