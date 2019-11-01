@@ -2,7 +2,7 @@ import { useReducer } from 'react'
 import { createContainer } from 'unstated-next'
 import { FolderKeys, Folders, Note, NoteId, Tag } from '../types'
 import uuid from 'uuid'
-import { LAST_NOTE_ID, saveNote } from '../api'
+import { LAST_NOTE_ID, saveNoteMeta, saveNoteContent } from '../api'
 
 export enum NoteActionType {
   CHOOSE_FOLDER = 'CHOOSE_FOLDER',
@@ -60,11 +60,18 @@ function notesReducer(state: NoteState, action: NoteAction): NoteState {
       if (state.activeTag) {
         newNote.tags.push(state.activeTag)
       }
-      saveNote(newNote)
+      saveNoteMeta(newNote)
       return { ...state, notes: [...state.notes, newNote], activeNoteId: newNote.id }
     case NoteActionType.EDIT_NOTE:
       const idx = state.notes.findIndex(x => x.id === state.activeNoteId)
-      saveNote({ id: state.notes[idx].id, ...action.payload, updateAt: new Date().toISOString() })
+      const updateAt = new Date().toISOString()
+      if (action.payload.text) {
+        // TODO: save content too frequently
+        saveNoteContent({ id: state.notes[idx].id, text: action.payload.text })
+        saveNoteMeta({ id: state.notes[idx].id, updateAt })
+      } else {
+        saveNoteMeta({ id: state.notes[idx].id, ...action.payload, updateAt })
+      }
       return {
         ...state,
         notes: [
@@ -72,7 +79,7 @@ function notesReducer(state: NoteState, action: NoteAction): NoteState {
           {
             ...state.notes[idx],
             ...action.payload,
-            updateAt: new Date().toISOString(),
+            updateAt,
           },
           ...state.notes.slice(idx + 1),
         ],

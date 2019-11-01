@@ -35,6 +35,14 @@ export const getInit = async () => {
   return axios.get(url).then(res => res.data)
 }
 
-export const saveNote = async (params: Partial<Note>) => {
-  return axios.post('/api/saveNote', params).then(res => res.data)
+export const saveNoteMeta = async (params: Partial<Note>) => {
+  return axios.post('/api/saveNoteMeta', params).then(res => res.data)
+}
+
+export const saveNoteContent = async (params: { id: string; text: string }) => {
+  return axios.post('/api/saveNoteContent', params).then(res => res.data)
+}
+
+export const saveTags = async (tags: Tag[]) => {
+  return axios.post('/api/saveTags', tags).then(res => res.data)
 }

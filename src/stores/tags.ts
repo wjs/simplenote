@@ -1,13 +1,14 @@
 import { useReducer } from 'react'
 import { createContainer } from 'unstated-next'
 import { Tag } from '../types'
+import { saveTags } from '../api'
 
 export interface TagState {
   tags: Tag[]
 }
 
 export const initialTagState: TagState = {
-  tags: ['aaa', 'bbb', 'ccc'],
+  tags: [],
 }
 
 export enum TagActionType {
@@ -24,22 +25,29 @@ export type TagAction =
   | { type: TagActionType.LOAD_TAGS; payload: Tag[] }
 
 function tagsReducer(state: TagState, action: TagAction): TagState {
+  let newState = state
   switch (action.type) {
     case TagActionType.ADD_TAG:
-      return { ...state, tags: [...state.tags, action.payload] }
+      newState = { ...state, tags: [...state.tags, action.payload] }
+      break
     case TagActionType.DEL_TAG:
-      return { ...state, tags: state.tags.filter(x => x !== action.payload) }
+      newState = { ...state, tags: state.tags.filter(x => x !== action.payload) }
+      break
     case TagActionType.EDIT_TAG:
       const { index, newTag } = action.payload
-      return {
+      newState = {
         ...state,
         tags: [...state.tags.slice(0, index), newTag, ...state.tags.slice(index + 1)],
       }
+      break
     case TagActionType.LOAD_TAGS:
-      return { ...state, tags: action.payload }
-    default:
-      return state
+      newState = { ...state, tags: action.payload }
+      break
   }
+  if (action.type !== TagActionType.LOAD_TAGS) {
+    saveTags(newState.tags)
+  }
+  return newState
 }
 
 function useTags(initial: TagState = initialTagState) {

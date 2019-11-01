@@ -26,18 +26,27 @@ let db
   db.defaults({ notes: [], tags: [] }).write()
 })()
 
-async function readFile(fileName) {
-  try {
-    return await fs.readFile(`${noteDir}/${fileName}.md`, 'utf8')
-  } catch (e) {
-    return ''
-  }
+function readFile(fileName) {
+  return new Promise(resolve => {
+    fs.readFile(`${noteDir}/${fileName}.md`, 'utf8', (err, data) => {
+      if (err) {
+        console.log(err)
+        resolve('')
+      }
+      resolve(data)
+    })
+  })
 }
 
-async function writeFile(id, text = '') {
-  try {
-    await fs.writeFile(`${noteDir}/${id}.md`, text, 'utf8')
-  } catch (e) {}
+function writeFile(id, text = '') {
+  return new Promise(resolve => {
+    fs.writeFile(`${noteDir}/${id}.md`, text, 'utf8', err => {
+      if (err) {
+        console.log(err)
+      }
+      resolve()
+    })
+  })
 }
 
 const app = new Koa()
@@ -46,12 +55,12 @@ app.use(bodyParser())
 
 const router = new Router()
 
-router.get('/api/init', async (ctx, next) => {
+router.get('/api/init', async ctx => {
   await db.read()
   let data = await db.getState()
   let { noteId } = ctx.request.query
   if (noteId) {
-    const note = db.get('notes').find({ id: noteId })
+    const note = data.notes.find(x => x.id === noteId)
     if (note) {
       note.text = await readFile(noteId)
     }
@@ -63,51 +72,29 @@ router.get('/api/init', async (ctx, next) => {
   ctx.body = data
 })
 
-router.get('/api/getNote/:id', async (ctx, next) => {
+router.get('/api/getNote/:id', async ctx => {
   const { id } = ctx.request.params
   ctx.body = {
     text: await readFile(id),
   }
 })
 
-router.post('/api/saveNote', async (ctx, next) => {
+router.post('/api/saveNoteMeta', async ctx => {
   const note = ctx.request.body
-  console.log(666, note)
   try {
-    const { id } = note
+    const { id, ...updator } = note
     if (id) {
-      console.log(111)
-      const noteInDb = await db.get('notes').find({ id })
-      console.log(222, noteInDb.value())
+      const notesDB = await db.get('notes')
+      const noteInDb = await notesDB.find({ id })
       if (noteInDb.value()) {
         // update
-        const { text, updateAt, tags, favorite, trash } = note
-        if (text) {
-          await writeFile(id, text)
-        }
-        if (updateAt) {
-          await noteInDb.update(x => ({ ...x, updateAt })).write()
-        }
-        if (tags) {
-          await noteInDb.update(x => ({ ...x, tags })).write()
-        }
-        if (favorite) {
-          await noteInDb.update(x => ({ ...x, favorite })).write()
-        }
-        if (trash) {
-          await noteInDb.update(x => ({ ...x, trash })).write()
-        }
+        await noteInDb.assign(updator).write()
       } else {
         // create
-        await db
-          .get('notes')
-          .push(note)
-          .write()
-        await writeFile(id, note.text)
+        await notesDB.push(note).write()
       }
-
       ctx.body = {
-        msg: 'save ok!',
+        msg: 'save note ok!',
       }
     } else {
       ctx.body = {
@@ -123,16 +110,40 @@ router.post('/api/saveNote', async (ctx, next) => {
   }
 })
 
-router.post('/api/updateTags', async (ctx, next) => {
-  const { tags } = ctx.request.body
+router.post('/api/saveNoteContent', async ctx => {
+  const note = ctx.request.body
   try {
-    ctx.body = {
-      msg: 'save ok!',
+    const { id, text } = note
+    if (id && text) {
+      await writeFile(id, text)
+      ctx.body = {
+        msg: 'save note ok!',
+      }
+    } else {
+      ctx.body = {
+        error: 1,
+        msg: 'save note error!',
+      }
     }
   } catch (e) {
     ctx.body = {
       error: 1,
       msg: 'save note error!',
+    }
+  }
+})
+
+router.post('/api/saveTags', async ctx => {
+  const tags = ctx.request.body
+  try {
+    await db.update('tags', () => tags || []).write()
+    ctx.body = {
+      msg: 'save tag ok!',
+    }
+  } catch (e) {
+    ctx.body = {
+      error: 1,
+      msg: 'save tag error!',
     }
   }
 })
