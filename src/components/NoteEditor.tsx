@@ -1,6 +1,14 @@
-import { IconButton, Popover, Tooltip } from '@material-ui/core'
+import {
+  IconButton,
+  Popover,
+  Tooltip,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Button,
+} from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { Favorite, FavoriteBorder, MoreVert } from '@material-ui/icons'
+import { Favorite, FavoriteBorder, MoreVert, Delete } from '@material-ui/icons'
 import 'codemirror/addon/selection/active-line'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/mode/gfm/gfm'
@@ -13,6 +21,7 @@ import React, { useEffect, useState } from 'react'
 import { Controlled as CodeMirror } from 'react-codemirror2'
 import { NoteActionType, NoteContainer, SettingContainer } from '../stores'
 import ChooseTagMenu from './ChooseTagMenu'
+import { delNote } from '../api'
 
 marked.setOptions({
   langPrefix: 'hljs ',
@@ -75,7 +84,10 @@ const useStyle = makeStyles({
     boxShadow: '0px -1px 1px 0px rgba(0,0,0,0.1)',
   },
   statusBtn: {
-    maxHeight: '40px',
+    height: '40px',
+    width: '40px',
+    marginLeft: '8px',
+    padding: '8px 12px',
   },
   tag: {
     height: '24px',
@@ -92,6 +104,7 @@ interface NoteEditorProps {}
 const NoteEditor: React.FC<NoteEditorProps> = () => {
   const classes = useStyle()
   const [tagMenuAnchorEl, setTagMenuAnchorEl] = useState<HTMLButtonElement | null>(null)
+  const [openDel, setOpenDel] = useState(false)
   const { settingState } = SettingContainer.useContainer()
   const { previewMode, darkMode, codeMirrorOptions } = settingState
   const { noteState, noteDispatch } = NoteContainer.useContainer()
@@ -112,11 +125,24 @@ const NoteEditor: React.FC<NoteEditorProps> = () => {
     return null
   }
 
+  const handleConfirmDelNote = () => {
+    if (activeNote.trash) {
+      noteDispatch({ type: NoteActionType.EDIT_NOTE, payload: { trash: true } })
+    } else {
+      delNote(activeNoteId).then(res => {
+        if (!res.error) {
+          noteDispatch({ type: NoteActionType.DEL_NOTE, payload: activeNoteId })
+        }
+      })
+    }
+    setOpenDel(false)
+  }
+
   return (
     <div className={`${classes.root} ${darkMode ? classes.dark : ''}`}>
       {previewMode ? (
         <div
-          className={`${classes.editor}`}
+          className={`markdown-body ${classes.editor}`}
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(marked(activeNote.text)),
           }}
@@ -193,6 +219,26 @@ const NoteEditor: React.FC<NoteEditorProps> = () => {
         >
           <ChooseTagMenu note={activeNote} />
         </Popover>
+        <div className="flex-grow-1"></div>
+        <IconButton onClick={() => setOpenDel(true)}>
+          <Delete />
+        </IconButton>
+
+        <Dialog disableBackdropClick maxWidth="xs" open={openDel}>
+          <DialogContent>
+            {activeNote.trash
+              ? 'Are you sure want to delete this note permanently?'
+              : 'Are you sure want to move this note to trash?'}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenDel(false)} color="default">
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmDelNote} color="primary">
+              Ok
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     </div>
   )

@@ -86,6 +86,7 @@ const AppSidebar: React.FC<AppSidebarProps> = () => {
   const handleAddNode = () => {
     noteDispatch({ type: NoteActionType.ADD_NOTE })
     settingDispatch({ type: SettingActionType.TOGGLE_PREVIEW_MODE, payload: false })
+    noteDispatch({ type: NoteActionType.CHOOSE_FOLDER, payload: Folders.ALL })
   }
 
   return (

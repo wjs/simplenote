@@ -1,6 +1,6 @@
 import { createMuiTheme, makeStyles, MuiThemeProvider } from '@material-ui/core/styles'
 import React, { useEffect } from 'react'
-import { getInit, saveData } from '../api'
+import { getInit, saveNoteContent, saveNoteMeta } from '../api'
 import {
   NoteActionType,
   NoteContainer,
@@ -33,11 +33,12 @@ const theme = createMuiTheme({
 
 const App: React.FC = () => {
   const classes = useStyles()
-  const { settingDispatch } = SettingContainer.useContainer()
+  const { settingState, settingDispatch } = SettingContainer.useContainer()
   const { noteState, noteDispatch } = NoteContainer.useContainer()
-  const { tagState, tagDispatch } = TagContainer.useContainer()
+  const { tagDispatch } = TagContainer.useContainer()
 
   useKey('esc', () => {
+    saveActiveNote()
     settingDispatch({ type: SettingActionType.TOGGLE_PREVIEW_MODE, payload: true })
   })
   useKey('g e', () => {
@@ -51,7 +52,7 @@ const App: React.FC = () => {
     settingDispatch({ type: SettingActionType.TOGGLE_PREVIEW_MODE, payload: false })
   })
   useKey(['ctrl+s', 'command+s'], () => {
-    saveData(noteState.notes, tagState.tags)
+    saveActiveNote()
   })
 
   useEffect(() => {
@@ -66,8 +67,19 @@ const App: React.FC = () => {
   }, [noteDispatch, tagDispatch])
 
   useInterval(() => {
-    saveData(noteState.notes, tagState.tags)
+    saveActiveNote()
   }, 20000)
+
+  const saveActiveNote = () => {
+    if (!settingState.previewMode) {
+      const { activeNoteId, notes } = noteState
+      const activeNote = notes.find(x => x.id === activeNoteId)
+      if (activeNote) {
+        saveNoteContent({ id: activeNoteId, text: activeNote.text })
+        saveNoteMeta({ id: activeNoteId, updateAt: activeNote.updateAt })
+      }
+    }
+  }
 
   return (
     <div className={classes.root}>

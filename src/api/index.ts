@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Note, Tag } from '../types'
+import { Note, Tag, NoteId } from '../types'
 
 export const NOTE_STORAGE_KEY = 'simplenote-notes'
 export const TAG_STORAGE_KEY = 'simplenote-tags'
@@ -41,6 +41,10 @@ export const saveNoteMeta = async (params: Partial<Note>) => {
 
 export const saveNoteContent = async (params: { id: string; text: string }) => {
   return axios.post('/api/saveNoteContent', params).then(res => res.data)
+}
+
+export const delNote = async (id: NoteId) => {
+  return axios.post('/api/delNote', id).then(res => res.data)
 }
 
 export const saveTags = async (tags: Tag[]) => {

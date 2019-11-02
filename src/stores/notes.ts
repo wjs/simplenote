@@ -1,8 +1,8 @@
 import { useReducer } from 'react'
 import { createContainer } from 'unstated-next'
-import { FolderKeys, Folders, Note, NoteId, Tag } from '../types'
 import uuid from 'uuid'
-import { LAST_NOTE_ID, saveNoteMeta, saveNoteContent } from '../api'
+import { LAST_NOTE_ID, saveNoteMeta } from '../api'
+import { FolderKeys, Folders, Note, NoteId, Tag } from '../types'
 
 export enum NoteActionType {
   CHOOSE_FOLDER = 'CHOOSE_FOLDER',
@@ -10,6 +10,7 @@ export enum NoteActionType {
   CHOOSE_NOTE = 'CHOOSE_NOTE',
   ADD_NOTE = 'ADD_NOTE',
   EDIT_NOTE = 'EDIT_NOTE',
+  DEL_NOTE = 'DEL_NOTE',
   LOAD_NOTES = 'LOAD_NOTES',
 }
 
@@ -19,6 +20,7 @@ export type NoteAction =
   | { type: NoteActionType.CHOOSE_NOTE; payload: NoteId }
   | { type: NoteActionType.ADD_NOTE }
   | { type: NoteActionType.EDIT_NOTE; payload: Partial<Note> }
+  | { type: NoteActionType.DEL_NOTE; payload: NoteId }
   | { type: NoteActionType.LOAD_NOTES; payload: Note[] }
 
 export interface NoteState {
@@ -65,11 +67,7 @@ function notesReducer(state: NoteState, action: NoteAction): NoteState {
     case NoteActionType.EDIT_NOTE:
       const idx = state.notes.findIndex(x => x.id === state.activeNoteId)
       const updateAt = new Date().toISOString()
-      if (action.payload.text) {
-        // TODO: save content too frequently
-        saveNoteContent({ id: state.notes[idx].id, text: action.payload.text })
-        saveNoteMeta({ id: state.notes[idx].id, updateAt })
-      } else {
+      if (!action.payload.text) {
         saveNoteMeta({ id: state.notes[idx].id, ...action.payload, updateAt })
       }
       return {
@@ -83,6 +81,14 @@ function notesReducer(state: NoteState, action: NoteAction): NoteState {
           },
           ...state.notes.slice(idx + 1),
         ],
+      }
+    case NoteActionType.DEL_NOTE:
+      const newNotes = state.notes.filter(x => x.id !== action.payload)
+      const activeNoteId = newNotes.length ? newNotes[0].id : ''
+      return {
+        ...state,
+        notes: newNotes,
+        activeNoteId,
       }
     case NoteActionType.LOAD_NOTES:
       return { ...state, notes: action.payload }

@@ -49,6 +49,17 @@ function writeFile(id, text = '') {
   })
 }
 
+function delFile(id) {
+  return new Promise(resolve => {
+    fs.unlink(`${noteDir}/${id}.md`, err => {
+      if (err) {
+        console.log(err)
+      }
+      resolve()
+    })
+  })
+}
+
 const app = new Koa()
 app.use(cors())
 app.use(bodyParser())
@@ -76,6 +87,25 @@ router.get('/api/getNote/:id', async ctx => {
   const { id } = ctx.request.params
   ctx.body = {
     text: await readFile(id),
+  }
+})
+
+router.post('/api/delNote', async ctx => {
+  const id = ctx.request.body
+  try {
+    await db
+      .get('notes')
+      .remove({ id })
+      .write()
+    await delFile(id)
+    ctx.body = {
+      msg: 'remove note ok!',
+    }
+  } catch (error) {
+    ctx.body = {
+      error: 1,
+      msg: 'save note error!',
+    }
   }
 })
 
